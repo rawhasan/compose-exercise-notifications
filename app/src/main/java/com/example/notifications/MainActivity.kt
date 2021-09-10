@@ -3,19 +3,24 @@ package com.example.notifications
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat.getSystemService
 import com.example.notifications.ui.theme.NotificationsTheme
 
 class MainActivity : ComponentActivity() {
@@ -34,14 +39,39 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun NotificationApp() {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        Text("Notification in Compose.", style = MaterialTheme.typography.subtitle1)
+    }
+
     val context = LocalContext.current
     val channelId = "MyTestChannel"
     val notificationId = 0
+    val myBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.header)
 
     val builder = NotificationCompat.Builder(context, channelId)
-        .setSmallIcon(R.drawable.ic_launcher_foreground)
+        .setSmallIcon(R.drawable.ic_edit_location) // 48 x 48 px looks perfect
         .setContentTitle("My Test Notification")
-        .setContentText("This is my test notification")
+        .setContentText("This is my test notification in one line...")
+        .setLargeIcon(myBitmap)
+        .setStyle(
+            NotificationCompat.BigTextStyle()
+                .bigText(
+                    "This is my test notification in one line. Made it longer " +
+                            "by setting the setStyle property. " +
+                            "It should not fit in one line anymore, " +
+                            "rather show as a longer notification content."
+                )
+        )
+        .setStyle(
+            NotificationCompat.BigPictureStyle()
+                .bigPicture(myBitmap)
+                .bigLargeIcon(null)
+        )
+
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
     createNotificationChannel(channelId, context)

@@ -2,7 +2,9 @@ package com.example.notifications
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
@@ -81,6 +83,19 @@ fun NotificationApp() {
             Text(text = "Simple Notification")
         }
 
+        // simple notification button with tap action
+        Button(onClick = {
+            showSimpleNotificationWithTapAction(
+                context,
+                channelId,
+                notificationId,
+                "Simple notification + Tap action",
+                "This simple notification will open an activity on tap."
+            )
+        }, modifier = Modifier.padding(top = 16.dp)) {
+            Text(text = "Simple Notification + Tap Action")
+        }
+
         // large text notification button
         Button(onClick = {
             showLargeTextNotification(
@@ -153,6 +168,34 @@ fun showSimpleNotification(
         .setContentTitle(textTitle)
         .setContentText(textContent)
         .setPriority(priority)
+
+    with(NotificationManagerCompat.from(context)) {
+        notify(notificationId, builder.build())
+    }
+}
+
+// shows a simple notification with a tap action to show an activity
+fun showSimpleNotificationWithTapAction(
+    context: Context,
+    channelId: String,
+    notificationId: Int,
+    textTitle: String,
+    textContent: String,
+    priority: Int = NotificationCompat.PRIORITY_DEFAULT
+) {
+    val intent = Intent(context, MainActivity::class.java).apply {
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    }
+
+    val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
+
+    val builder = NotificationCompat.Builder(context, channelId)
+        .setSmallIcon(R.drawable.ic_edit_location)
+        .setContentTitle(textTitle)
+        .setContentText(textContent)
+        .setPriority(priority)
+        .setContentIntent(pendingIntent)
+        .setAutoCancel(true)
 
     with(NotificationManagerCompat.from(context)) {
         notify(notificationId, builder.build())
